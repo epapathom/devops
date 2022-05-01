@@ -1,0 +1,9 @@
+# local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# AWS EC2 key pairs
+*.pem
