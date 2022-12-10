@@ -1,24 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = "eu-central-1"
-}
-
-terraform {
-  backend "s3" {
-    bucket = "epapathom-terraform-state"
-    key    = "website/terraform.tfstate"
-    region = "eu-central-1"
-  }
-}
-
 resource "aws_security_group" "website_lb_sg" {
   name        = "website-lb-sg"
   description = "The website Load Balancer security group"
@@ -93,7 +72,7 @@ resource "aws_autoscaling_group" "website_autoscaling_group" {
   name                 = aws_launch_configuration.website_launch_configuration.name
   launch_configuration = aws_launch_configuration.website_launch_configuration.name
   target_group_arns    = [aws_lb_target_group.website_tg.arn]
-  vpc_zone_identifier  = [var.public_subnet_a_id, var.public_subnet_b_id, var.public_subnet_c_id]
+  vpc_zone_identifier  = [var.private_subnet_a_id, var.private_subnet_b_id, var.private_subnet_c_id]
   min_elb_capacity     = 1
   desired_capacity     = 1
   min_size             = 1
@@ -106,6 +85,12 @@ resource "aws_autoscaling_group" "website_autoscaling_group" {
   tag {
     key                 = "Name"
     value               = "website"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "backup"
+    value               = "true"
     propagate_at_launch = true
   }
 
